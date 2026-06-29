@@ -1,0 +1,12 @@
+{
+  "name": "@seriesos/ai",
+  "version": "0.1.0",
+  "private": true,
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@seriesos/db": "*",
+    "@seriesos/lib": "*"
+  },
+  "devDependencies": { "typescript": "^5.6.3" }
+}

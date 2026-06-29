@@ -1,0 +1,904 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// SERIES OS 2.0 — Prisma Schema
+// PostgreSQL via Supabase with Row-Level Security
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── ENUMS ───────────────────────────────────────────────────────────────────
+
+enum Plan {
+  FOUNDER_STARTER
+  FOUNDER_PRO
+  FOUNDER_SCALE
+  ADVISOR
+  ACCELERATOR
+  ENTERPRISE
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MEMBER
+  ADVISOR
+  VIEWER
+}
+
+enum CompanyStage {
+  IDEA
+  MVP
+  PRE_REVENUE
+  EARLY_REVENUE
+  SCALING
+}
+
+enum Industry {
+  SAAS_B2B
+  CONSUMER_APP
+  AI_ML
+  CYBERSECURITY
+  DEVELOPER_TOOLS
+  DATA_ANALYTICS
+  WEB3_CRYPTO
+  FINTECH
+  INSURTECH
+  PAYMENTS_BANKING
+  REAL_ESTATE
+  HEALTHTECH
+  BIOTECH
+  MENTAL_HEALTH
+  MEDICAL_DEVICES
+  CONSUMER_GOODS
+  ECOMMERCE_RETAIL
+  FOOD_BEVERAGE
+  FASHION_BEAUTY
+  MEDIA_ENTERTAINMENT
+  GAMING
+  CLEANTECH_CLIMATE
+  SOCIAL_IMPACT
+  GOVTECH
+  DEFENSE_NATIONAL_SECURITY
+  AGTECH
+  EDTECH
+  HRTECH
+  LEGALTECH
+  LOGISTICS
+  HARDWARE_MANUFACTURING
+  SPACE_AEROSPACE
+  OTHER
+}
+
+enum FundingGoal {
+  ANGEL_VC
+  GRANTS_NONDILUTIVE
+  ACCELERATORS
+  GOVERNMENT_CONTRACTS
+  DEBT_REVENUE_BASED
+  SBIR_STTR
+}
+
+enum CustomerType {
+  B2B_ENTERPRISE
+  B2B_SMB
+  B2C_CONSUMER
+  GOVERNMENT_FEDERAL
+  GOVERNMENT_STATE_LOCAL
+  HEALTHCARE
+  DEFENSE
+  NONPROFIT
+}
+
+enum DataClassification {
+  NONE
+  PII
+  PHI_HIPAA
+  CUI_CMMC
+  FINANCIAL_PCI
+  CLASSIFIED
+}
+
+enum PortalType {
+  INVESTOR
+  GRANT
+  ENTERPRISE
+  GOVERNMENT_CONTRACT
+  COMPLIANCE
+  ACQUISITION
+  FDA
+  SBIR
+  MANUFACTURING
+  RETAIL
+  INTERNATIONAL
+}
+
+enum ComplianceFramework {
+  SOC2_TYPE1
+  SOC2_TYPE2
+  HIPAA
+  HITECH
+  HITRUST
+  GDPR
+  CCPA
+  PCI_DSS
+  AML_KYC
+  CMMC_LEVEL1
+  CMMC_LEVEL2
+  CMMC_LEVEL3
+  FEDRAMP
+  NIST_AI_RMF
+  ISO_42001
+  ISO_27001
+  ISO_13485
+  GLP
+  GMP
+  FDA_510K
+  FDA_PMA
+  ITAR
+  EAR
+  FERPA
+  COPPA
+  SAM_UEI_REGISTRATION
+  SBIR_ELIGIBILITY
+  TRADEMARK
+  PRODUCT_LIABILITY
+  OTHER
+}
+
+enum ComplianceStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETE
+  WAIVED
+  NOT_APPLICABLE
+}
+
+enum PipelineContactType {
+  INVESTOR
+  GRANT
+  ACCELERATOR
+  GOVERNMENT
+  VENDOR
+}
+
+enum PipelineStage {
+  RESEARCHING
+  CONTACTED
+  MEETING_SCHEDULED
+  MEETING_COMPLETE
+  DILIGENCE
+  TERM_SHEET
+  CLOSED_WON
+  CLOSED_LOST
+  ON_HOLD
+}
+
+enum DocumentType {
+  PITCH_DECK
+  FINANCIAL_PROJECTIONS
+  EXECUTIVE_SUMMARY
+  CAP_TABLE
+  TEAM_BIOS
+  PRODUCT_DEMO
+  LEGAL_INCORPORATION
+  CUSTOMER_TESTIMONIALS
+  MARKET_RESEARCH
+  PATENT_IP
+  COMPLIANCE_CERT
+  GRANT_APPLICATION
+  CAPABILITY_STATEMENT
+  OTHER
+}
+
+enum AIOutputType {
+  EMAIL_COLD_INTRO
+  EMAIL_FOLLOWUP
+  EMAIL_SEND_DECK
+  EMAIL_MEETING_REQUEST
+  EMAIL_INVESTOR_UPDATE
+  EXEC_SUMMARY
+  INVESTOR_MEMO
+  FOUNDER_BIO
+  TEAM_BIO
+  USE_OF_FUNDS
+  MILESTONE_PLAN
+  GRANT_ABSTRACT
+  CAPABILITY_STATEMENT
+  COMPLIANCE_POLICY
+  PITCH_SCORE
+  REPLY_CLASSIFY
+  CALL_PREP
+  INVESTOR_RESEARCH
+  COMPLIANCE_ADVISOR
+}
+
+enum SendQueueStatus {
+  PENDING
+  APPROVED
+  BLOCKED
+  SENT
+  CANCELLED
+}
+
+enum OutreachEventStatus {
+  SENT
+  OPENED
+  CLICKED
+  REPLIED
+  BOUNCED
+  UNSUBSCRIBED
+  FAILED
+}
+
+enum SuppressionReason {
+  UNSUBSCRIBED
+  BOUNCED
+  COMPLAINT
+  MANUAL
+  COMPETITOR
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  UNPAID
+  PAUSED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  ACCESS
+  SHARE
+  EXPORT
+  LOGIN
+  LOGOUT
+  INVITE
+  REMOVE
+  IMPERSONATE
+}
+
+enum CertificationType {
+  INVESTOR_READY
+  GRANT_READY
+  ENTERPRISE_READY
+  GOVERNMENT_CONTRACT_READY
+  COMPLIANCE_READY
+}
+
+enum MarketplaceServiceType {
+  SOC2_AUDIT
+  HIPAA_COMPLIANCE
+  CMMC_CERTIFICATION
+  GRANT_WRITING
+  PATENT_SERVICES
+  FRACTIONAL_CFO
+  REGULATORY_STRATEGY
+  INVESTOR_RELATIONS
+  LEGAL_FORMATION
+  TRADEMARK_REGISTRATION
+  FDA_CONSULTING
+  SBIR_CONSULTING
+  OTHER
+}
+
+enum UsageEventType {
+  AI_TOKEN
+  EMAIL_SEND
+  DOCUMENT_DOWNLOAD
+  DOCUMENT_UPLOAD
+  SEAT_ADDED
+  COMPANY_ADDED
+  SHARE_LINK_CREATED
+}
+
+// ─── CORE TABLES ─────────────────────────────────────────────────────────────
+
+model Organization {
+  id                   String             @id @default(cuid())
+  name                 String
+  slug                 String             @unique
+  plan                 Plan               @default(FOUNDER_STARTER)
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  seats                Int                @default(1)
+  adminUserId          String?
+  logoUrl              String?
+  websiteUrl           String?
+  whitelabelEnabled    Boolean            @default(false)
+  whitelabelDomain     String?            @unique
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  // Relations
+  users                User[]
+  companies            Company[]
+  subscription         Subscription?
+  auditLogs            AuditLog[]
+  usageEvents          UsageEvent[]
+  referralsMade        Referral[]         @relation("ReferrerOrg")
+  referralsReceived    Referral[]         @relation("ReferredOrg")
+
+  @@map("organizations")
+}
+
+model User {
+  id                String       @id @default(cuid())
+  organizationId    String
+  email             String       @unique
+  emailVerified     Boolean      @default(false)
+  name              String
+  avatarUrl         String?
+  role              UserRole     @default(MEMBER)
+  mfaEnabled        Boolean      @default(false)
+  mfaSecret         String?      // AES-256-GCM encrypted
+  passwordHash      String?
+  lastLoginAt       DateTime?
+  loginAttempts     Int          @default(0)
+  lockedUntil       DateTime?
+  invitedBy         String?
+  inviteToken       String?      @unique
+  inviteExpiresAt   DateTime?
+  resetToken        String?      @unique
+  resetExpiresAt    DateTime?
+  verifyToken       String?      @unique
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  // Relations
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  accounts          Account[]
+  sessions          Session[]
+  aiOutputs         AIOutput[]
+  auditLogs         AuditLog[]
+  notifications     Notification[]
+  documents         Document[]
+
+  @@map("users")
+}
+
+// NextAuth.js required tables
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Company {
+  id                 String             @id @default(cuid())
+  organizationId     String
+  name               String
+  industry           Industry           @default(OTHER)
+  stage              CompanyStage       @default(IDEA)
+  revenue            String?            // e.g. "$0", "$50K", "$1M+"
+  targetRaise        String?            // e.g. "$500K-$1M"
+  fundingGoals       FundingGoal[]
+  customerTypes      CustomerType[]
+  dataClassification DataClassification @default(NONE)
+  locationState      String?
+  locationCountry    String             @default("US")
+  websiteUrl         String?
+  linkedinUrl        String?
+  description        String?            @db.Text
+  problem            String?            @db.Text
+  solution           String?            @db.Text
+  traction           String?            @db.Text
+  useOfFunds         String?            @db.Text
+  pitchDeckUrl       String?
+  teamSize           Int?
+  foundedYear        Int?
+  isActive           Boolean            @default(true)
+  onboardingComplete Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  // Relations
+  organization       Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  readinessScore     ReadinessScore?
+  readinessPortals   ReadinessPortal[]
+  complianceItems    ComplianceRequirement[]
+  dataRoom           DataRoom?
+  pipelines          Pipeline[]
+  aiOutputs          AIOutput[]
+  outreachEvents     OutreachEvent[]
+  sendQueue          SendQueueItem[]
+  capTable           CapTableEntry[]
+  safeNotes          SafeNote[]
+  certifications     Certification[]
+  bankConnections    BankConnection[]
+
+  @@map("companies")
+}
+
+// ─── READINESS ENGINE ────────────────────────────────────────────────────────
+
+model ReadinessScore {
+  id                   String   @id @default(cuid())
+  companyId            String   @unique
+  overallScore         Int      @default(0)  // 0-100
+  companyProfileScore  Int      @default(0)
+  teamScore            Int      @default(0)
+  productScore         Int      @default(0)
+  marketScore          Int      @default(0)
+  financialsScore      Int      @default(0)
+  legalScore           Int      @default(0)
+  complianceScore      Int      @default(0)
+  dataRoomScore        Int      @default(0)
+  fundingStrategyScore Int      @default(0)
+  lastCalculatedAt     DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  company              Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("readiness_scores")
+}
+
+model ReadinessPortal {
+  id                String     @id @default(cuid())
+  companyId         String
+  portalType        PortalType
+  locked            Boolean    @default(true)
+  completionPct     Int        @default(0)  // 0-100
+  unlockedAt        DateTime?
+  requiredItemIds   String[]   // IDs of ComplianceRequirement or checklist items
+  updatedAt         DateTime   @updatedAt
+
+  company           Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, portalType])
+  @@map("readiness_portals")
+}
+
+model ComplianceRequirement {
+  id                  String              @id @default(cuid())
+  companyId           String
+  framework           ComplianceFramework
+  status              ComplianceStatus    @default(NOT_STARTED)
+  priority            Int                 @default(5)  // 1=Critical, 5=Low
+  estimatedCostMin    Int?                // USD
+  estimatedCostMax    Int?                // USD
+  estimatedWeeks      Int?
+  vendorCategories    MarketplaceServiceType[]
+  whyItMatters        String?             @db.Text
+  howToAchieve        String?             @db.Text
+  nextActions         String[]
+  documentUrl         String?
+  completedAt         DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  company             Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, framework])
+  @@map("compliance_requirements")
+}
+
+// ─── DATA ROOM ───────────────────────────────────────────────────────────────
+
+model DataRoom {
+  id               String     @id @default(cuid())
+  companyId        String     @unique
+  shareToken       String     @unique @default(cuid())
+  shareEnabled     Boolean    @default(false)
+  shareExpiresAt   DateTime?
+  requireNDA       Boolean    @default(false)
+  watermarkEnabled Boolean    @default(false)
+  watermarkText    String?
+  viewCount        Int        @default(0)
+  lastSharedAt     DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  company          Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documents        Document[]
+
+  @@map("data_rooms")
+}
+
+model Document {
+  id             String       @id @default(cuid())
+  dataRoomId     String
+  name           String
+  docType        DocumentType @default(OTHER)
+  storageKey     String?      // Supabase Storage path
+  mimeType       String?
+  sizeBytes      Int?
+  externalUrl    String?      // Google Drive, Notion, etc.
+  uploadedById   String
+  downloadCount  Int          @default(0)
+  lastAccessedAt DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  dataRoom       DataRoom     @relation(fields: [dataRoomId], references: [id], onDelete: Cascade)
+  uploadedBy     User         @relation(fields: [uploadedById], references: [id])
+
+  @@map("documents")
+}
+
+// ─── INVESTORS (Global) ──────────────────────────────────────────────────────
+
+model Investor {
+  id                  String     @id @default(cuid())
+  name                String
+  firm                String?
+  email               String?    @unique
+  linkedinUrl         String?
+  websiteUrl          String?
+  twitterUrl          String?
+  photoUrl            String?
+  thesis              String?    @db.Text
+  checkSizeMin        Int?       // USD thousands
+  checkSizeMax        Int?       // USD thousands
+  stagesInvested      String[]   // e.g. ["PRE_SEED", "SEED"]
+  industriesFocused   String[]
+  geographyFocused    String[]
+  diversityFocused    Boolean    @default(false)
+  notable             String?    // Notable portfolio companies
+  verified            Boolean    @default(false)
+  lastVerifiedAt      DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  pipelines           Pipeline[]
+
+  @@map("investors")
+}
+
+// ─── GRANTS (Global) ─────────────────────────────────────────────────────────
+
+model Grant {
+  id                  String   @id @default(cuid())
+  title               String
+  agency              String
+  programType         String   // SBIR, STTR, FEDERAL, STATE, LOCAL, FOUNDATION
+  description         String?  @db.Text
+  maxAmount           Int?     // USD
+  deadline            DateTime?
+  eligibilityCriteria String[]
+  industriesFocused   String[]
+  geographyFocused    String[]
+  externalUrl         String?
+  sourceId            String?  // External ID from Grants.gov etc.
+  isActive            Boolean  @default(true)
+  lastSyncedAt        DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  pipelines           Pipeline[]
+
+  @@map("grants")
+}
+
+// ─── PIPELINE CRM ────────────────────────────────────────────────────────────
+
+model Pipeline {
+  id            String              @id @default(cuid())
+  companyId     String
+  contactType   PipelineContactType
+  investorId    String?
+  grantId       String?
+  contactName   String
+  contactFirm   String?
+  contactEmail  String?
+  stage         PipelineStage       @default(RESEARCHING)
+  matchScore    Int?                // 0-100
+  notes         String?             @db.Text
+  nextFollowUp  DateTime?
+  addedAt       DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  company       Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  investor      Investor?           @relation(fields: [investorId], references: [id])
+  grant         Grant?              @relation(fields: [grantId], references: [id])
+
+  @@map("pipelines")
+}
+
+// ─── EQUITY ──────────────────────────────────────────────────────────────────
+
+model CapTableEntry {
+  id           String   @id @default(cuid())
+  companyId    String
+  name         String
+  role         String?
+  shareType    String   @default("Common") // Common, Preferred, Option, Warrant
+  shares       Float?
+  ownershipPct Float?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("cap_table_entries")
+}
+
+model SafeNote {
+  id              String   @id @default(cuid())
+  companyId       String
+  investorName    String
+  amountUsd       Float
+  valuationCapUsd Float?
+  discountRate    Float?   // e.g. 0.20 for 20%
+  investmentDate  DateTime?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("safe_notes")
+}
+
+// ─── BANKING ─────────────────────────────────────────────────────────────────
+
+model BankConnection {
+  id             String   @id @default(cuid())
+  companyId      String
+  provider       String   @default("MERCURY") // MERCURY, PLAID
+  encryptedToken String   // AES-256-GCM encrypted API key
+  accountName    String?
+  lastSyncedAt   DateTime?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("bank_connections")
+}
+
+// ─── AI & OUTREACH ───────────────────────────────────────────────────────────
+
+model AIOutput {
+  id             String       @id @default(cuid())
+  companyId      String
+  userId         String
+  outputType     AIOutputType
+  prompt         String?      @db.Text
+  response       String       @db.Text
+  tokensUsed     Int          @default(0)
+  modelUsed      String       @default("claude-3-haiku-20240307")
+  costUsd        Float        @default(0)
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+
+  company        Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@map("ai_outputs")
+}
+
+model OutreachEvent {
+  id             String              @id @default(cuid())
+  companyId      String
+  recipientEmail String
+  recipientName  String?
+  recipientFirm  String?
+  sentAt         DateTime            @default(now())
+  sequenceStage  Int                 @default(1)
+  subjectLine    String?
+  bodyHash       String?             // SHA-256 for duplicate prevention
+  status         OutreachEventStatus @default(SENT)
+  matchScore     Int?
+  openedAt       DateTime?
+  repliedAt      DateTime?
+
+  company        Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("outreach_events")
+}
+
+model SendQueueItem {
+  id             String          @id @default(cuid())
+  companyId      String
+  recipientEmail String
+  recipientName  String?
+  recipientFirm  String?
+  scheduledFor   DateTime
+  status         SendQueueStatus @default(PENDING)
+  blockReason    String?
+  matchScore     Int?
+  sequenceStage  Int             @default(1)
+  emailSubject   String?
+  emailBody      String?         @db.Text
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("send_queue")
+}
+
+model SuppressionList {
+  id          String            @id @default(cuid())
+  email       String?
+  domain      String?
+  reason      SuppressionReason @default(MANUAL)
+  isGlobal    Boolean           @default(false)
+  addedByOrgId String?
+  addedAt     DateTime          @default(now())
+
+  @@unique([email, addedByOrgId])
+  @@unique([domain, addedByOrgId])
+  @@map("suppression_lists")
+}
+
+// ─── BILLING ─────────────────────────────────────────────────────────────────
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  organizationId       String             @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  stripeCustomerId     String?
+  plan                 Plan               @default(FOUNDER_STARTER)
+  status               SubscriptionStatus @default(TRIALING)
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  trialEndsAt          DateTime?
+  cancelledAt          DateTime?
+  aiCreditsIncluded    Int                @default(100)
+  aiCreditsUsed        Int                @default(0)
+  seatsIncluded        Int                @default(1)
+  companiesIncluded    Int                @default(1)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  organization         Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model UsageEvent {
+  id                  String          @id @default(cuid())
+  organizationId      String
+  eventType           UsageEventType
+  quantity            Int             @default(1)
+  unitCostUsd         Float           @default(0)
+  stripeUsageRecordId String?
+  metadata            Json?
+  createdAt           DateTime        @default(now())
+
+  organization        Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("usage_events")
+}
+
+// ─── PLATFORM ────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id             String      @id @default(cuid())
+  organizationId String
+  userId         String?
+  action         AuditAction
+  resource       String      // e.g. "Company", "Document", "Pipeline"
+  resourceId     String?
+  ipAddress      String?
+  userAgent      String?
+  before         Json?
+  after          Json?
+  createdAt      DateTime    @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id])
+
+  @@index([organizationId, createdAt])
+  @@index([resource, resourceId])
+  @@map("audit_logs")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  actionUrl String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+model Certification {
+  id               String            @id @default(cuid())
+  companyId        String
+  certType         CertificationType
+  issuedAt         DateTime          @default(now())
+  expiresAt        DateTime?
+  badgeUrl         String?
+  verificationCode String            @unique @default(cuid())
+  publicUrl        String?
+  revokedAt        DateTime?
+
+  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, certType])
+  @@map("certifications")
+}
+
+model MarketplaceListing {
+  id              String                 @id @default(cuid())
+  providerName    String
+  providerEmail   String
+  serviceType     MarketplaceServiceType
+  title           String
+  description     String?                @db.Text
+  priceMin        Int?                   // USD
+  priceMax        Int?                   // USD
+  deliveryWeeks   Int?
+  rating          Float?
+  reviewCount     Int                    @default(0)
+  websiteUrl      String?
+  calendlyUrl     String?
+  active          Boolean                @default(true)
+  verified        Boolean                @default(false)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@map("marketplace_listings")
+}
+
+model Referral {
+  id               String       @id @default(cuid())
+  referrerOrgId    String
+  referredEmail    String
+  referredOrgId    String?
+  status           String       @default("PENDING") // PENDING, SIGNED_UP, CONVERTED
+  commissionUsd    Float?
+  paidAt           DateTime?
+  createdAt        DateTime     @default(now())
+
+  referrerOrg      Organization @relation("ReferrerOrg", fields: [referrerOrgId], references: [id])
+  referredOrg      Organization? @relation("ReferredOrg", fields: [referredOrgId], references: [id])
+
+  @@map("referrals")
+}

@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Lint & Type Check ────────────────────────────────────────────────────
+  quality:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run type-check
+
+  # ── Tests ────────────────────────────────────────────────────────────────
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: quality
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: seriesos
+          POSTGRES_PASSWORD: seriesos_test
+          POSTGRES_DB: seriesos_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://seriesos:seriesos_test@localhost:5432/seriesos_test
+      DIRECT_URL: postgresql://seriesos:seriesos_test@localhost:5432/seriesos_test
+      NEXTAUTH_SECRET: test-secret-not-for-production
+      NEXTAUTH_URL: http://localhost:3000
+      ENCRYPTION_KEY: 0000000000000000000000000000000000000000000000000000000000000001
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run db:generate
+        working-directory: packages/db
+      - run: npx prisma migrate deploy
+        working-directory: packages/db
+        env:
+          DATABASE_URL: postgresql://seriesos:seriesos_test@localhost:5432/seriesos_test
+      - run: npm test
+
+  # ── Build Check ──────────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: quality
+    env:
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build
+
+  # ── Migration Safety Check ───────────────────────────────────────────────
+  migration-check:
+    name: Migration Safety
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check for destructive migrations
+        run: |
+          git diff origin/main -- packages/db/prisma/schema.prisma | grep -E "^-" | grep -iE "(String|Int|Boolean|DateTime|Float)" && \
+          echo "⚠️  Potentially destructive schema change detected — review carefully before merging" || \
+          echo "✅ No destructive changes detected"
+
+  # ── Security Audit ───────────────────────────────────────────────────────
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm audit --audit-level=high

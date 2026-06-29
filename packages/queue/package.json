@@ -1,0 +1,8 @@
+{
+  "name": "@seriesos/queue",
+  "version": "0.1.0",
+  "private": true,
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "bullmq": "^5.30.1", "ioredis": "^5.4.1", "@seriesos/db": "*", "@seriesos/ai": "*", "@seriesos/email": "*", "@seriesos/lib": "*" },
+  "devDependencies": { "typescript": "^5.6.3" }
+}
