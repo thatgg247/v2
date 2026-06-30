@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 import { constructWebhookEvent, getPlanFromPriceId } from "@seriesos/billing";
 import { prisma, Plan, SubscriptionStatus } from "@seriesos/db";
