@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["@seriesos/db", "@seriosos/lib", "@seriosos/ai", "@seriesos/email", "@seriosos/billing", "@seriosos/queue"],
+  transpilePackages: ["@seriesos/db", "@seriesos/lib", "@seriesos/ai", "@seriesos/email", "@seriesos/billing", "@seriesos/queue"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "**.supabase.co" },

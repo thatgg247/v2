@@ -2,7 +2,7 @@ import { router, publicProcedure, protectedProcedure } from "@/lib/trpc";
 import { z } from "zod";
 import { hash } from "bcryptjs";
 import { prisma, UserRole } from "@seriesos/db";
-import { generateSlug } from "@seriosos/lib";
+import { generateSlug } from "@seriesos/lib";
 import { sendVerificationEmail, sendPasswordResetEmail, sendWelcomeEmail } from "@seriesos/email";
 import crypto from "crypto";
 
