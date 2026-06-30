@@ -1,6 +1,4 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "turbo run build --filter=@seriesos/web",
-  "outputDirectory": "apps/web/.next",
-  "installCommand": "npm install"
+  "buildCommand": "cd ../.. && npx turbo run build --filter=@seriesos/web",
+  "installCommand": "cd ../.. && npm install"
 }
