@@ -2,7 +2,15 @@
   "name": "@seriesos/billing",
   "version": "0.1.0",
   "private": true,
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "stripe": "^17.3.1", "@seriesos/lib": "*" },
-  "devDependencies": { "typescript": "^5.6.3" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "stripe": "^17.3.1",
+    "@seriesos/lib": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "main": "./src/index.ts"
 }

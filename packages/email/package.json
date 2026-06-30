@@ -2,7 +2,14 @@
   "name": "@seriesos/email",
   "version": "0.1.0",
   "private": true,
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@sendgrid/mail": "^8.1.4" },
-  "devDependencies": { "typescript": "^5.6.3" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "main": "./src/index.ts"
 }
